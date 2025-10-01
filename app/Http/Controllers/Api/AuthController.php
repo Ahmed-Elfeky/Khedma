@@ -13,9 +13,6 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-
-
-
     public function register(RegisterRequest $request)
     {
         $user = User::create([
@@ -25,36 +22,28 @@ class AuthController extends Controller
         ]);
 
         $token = $user->createToken('myapptoken')->plainTextToken;
-
         return ApiResponse::SendResponse(201, 'User Created Successfully', [
             'user'  => new UserResource($user),
             'token' => $token,
         ]);
     }
 
-
-
     public function login(LoginRequest $request)
     {
         $user = User::where('phone', $request->phone)->first();
-
         if (!$user || !Hash::check($request->password, $user->password)) {
             return ApiResponse::SendResponse(401, 'Invalid phone or password', []);
         }
 
         $token = $user->createToken('apiToken')->plainTextToken;
-
         return ApiResponse::SendResponse(
             200,
             'Login Successfully',
             (new UserResource($user))->additional(['token' => $token])
         );
     }
-
-
-
-    public function logout()
-    {
+// logout
+    public function logout(){
         if (Auth::check()) {
             Auth::user()->tokens()->delete();
             return ApiResponse::SendResponse(200, 'Logged out successfully', []);
