@@ -2,6 +2,10 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\ColorController;
+use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\SizeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -10,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 */
+Route::get('home', [HomeController::class, 'index']);
 
 Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
@@ -20,7 +25,12 @@ Route::controller(AuthController::class)->group(function () {
 });
 
 Route::apiResource('banners', BannerController::class);
-    
+Route::get('categories', [CategoryController::class, 'index']);
+Route::get('colors', [ColorController::class, 'index']);
+Route::get('sizes', [SizeController::class, 'index']);
+
+
+
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
 // });

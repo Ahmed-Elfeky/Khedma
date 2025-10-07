@@ -9,7 +9,7 @@ class Size extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name','desc'];
+    protected $fillable = ['name'];
 
 
 
