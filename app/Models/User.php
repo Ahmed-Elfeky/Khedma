@@ -11,11 +11,16 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    
+    protected $appends = ['is_verified'];
+
+
     protected $fillable = [
         'name',
         'phone',
         'password',
+        'otp_expires_at',
+        'otp_code',
+        'is_verified'
     ];
 
     /**
