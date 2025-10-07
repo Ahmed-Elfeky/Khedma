@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\SizeController;
@@ -28,6 +29,7 @@ Route::apiResource('banners', BannerController::class);
 Route::get('categories', [CategoryController::class, 'index']);
 Route::get('colors', [ColorController::class, 'index']);
 Route::get('sizes', [SizeController::class, 'index']);
+Route::get('cities', [CityController::class , 'index']);
 
 
 

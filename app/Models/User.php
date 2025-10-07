@@ -18,10 +18,27 @@ class User extends Authenticatable
         'name',
         'phone',
         'password',
-        'otp_expires_at',
         'otp_code',
-        'is_verified'
+        'otp_expires_at',
+        'is_verified',
+        'user_type',
+        'address',
+        'city_id',
+        'website',
+        'commercial_registration',
+        'tax_number',
+        'logo',
+        'longitude',
+        'latitude'
     ];
+
+
+
+    public function city()
+    {
+        return $this->belongsTo(City::class);
+    }
+
 
     /**
      * The attributes that should be hidden for serialization.

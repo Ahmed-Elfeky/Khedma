@@ -22,10 +22,10 @@ class RegisterRequest extends FormRequest
 
 
 
-// validation api response //
+    // validation api response //
     protected function failedValidation(Validator $validator)
     {
-    if ($this->is('api/*')) {
+        if ($this->is('api/*')) {
             $response =  ApiResponse::SendResponse(422, ' validation errors',  $validator->messages()->all());
             throw new ValidationException($validator, $response);
         }
@@ -39,14 +39,24 @@ class RegisterRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
-            'name'     => 'required|string|max:255',
-            'phone'    => 'required|string|unique:users,phone',
-            'password' => 'required|string|min:6',
+            'name' => 'required|string|max:255',
+            'phone' => 'required|string|unique:users,phone',
+            'password' => 'required|string|min:6|confirmed',
+
+            // بيانات الشركة (لو user_type = company)
+            'address' => 'nullable|string',
+            'city_id' => 'nullable|exists:cities,id',
+            'website' => 'nullable|string',
+            'commercial_registration' => 'nullable|string',
+            'tax_number' => 'nullable|string',
+            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
+
+            'latitude' => 'nullable|numeric|between:-90,90',
+            'longitude' => 'nullable|numeric|between:-180,180',
+
         ];
     }
-
 
     public function messages(): array
     {
@@ -57,6 +67,9 @@ class RegisterRequest extends FormRequest
             'password.required'  => 'كلمة المرور مطلوبة',
             'password.min'       => 'كلمة المرور يجب ألا تقل عن 6 أحرف',
             'password.confirmed' => 'تأكيد كلمة المرور غير متطابق',
+            'logo.image'         => 'الملف المرفوع يجب أن يكون صورة',
+            'logo.mimes'         => 'امتداد الصورة يجب أن يكون png أو jpg أو jpeg',
+            'logo.max'           => 'حجم الصورة يجب ألا يزيد عن 2 ميجا بايت',
         ];
     }
 }

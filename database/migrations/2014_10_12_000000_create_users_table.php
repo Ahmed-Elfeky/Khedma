@@ -19,7 +19,17 @@ return new class extends Migration
             $table->string('otp_code')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('is_verified')->default(false);
-            $table->string('user_type')->default('user');//user or company
+            $table->string('user_type')->default('user'); // user or company
+            // بيانات الشركة (في حالة كان user_type = company)
+            $table->string('address')->nullable();           // العنوان
+            $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('set null');
+            $table->string('website')->nullable();           // الموقع الإلكتروني
+            $table->string('commercial_registration')->nullable(); // السجل التجاري
+            $table->string('tax_number')->nullable();        // الرقم الضريبي
+            $table->string('logo')->nullable();              // شعار الشركة (صورة)
+            // خطوط الطول ودوائر العرض
+            $table->decimal('latitude', 10, 7)->nullable();   // مثال: 30.044420
+            $table->decimal('longitude', 10, 7)->nullable();  // مثال: 31.235712
             $table->rememberToken();
             $table->timestamps();
         });

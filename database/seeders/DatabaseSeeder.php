@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             BannerSeeder::class,
+            CitySeeder::class,
             CategorySeeder::class,
             SubcategorySeeder::class,
             ColorSeeder::class,
