@@ -40,20 +40,19 @@ class RegisterRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255',
-            'phone' => 'required|string|unique:users,phone',
-            'password' => 'required|string|min:6|confirmed',
+            'name'                     => 'required|string|max:255',
+            'phone'                    => 'required|string|unique:users,phone',
+            'password'                 => 'required|string|min:6|confirmed',
 
             // بيانات الشركة (لو user_type = company)
-            'address' => 'nullable|string',
-            'city_id' => 'nullable|exists:cities,id',
-            'website' => 'nullable|string',
-            'commercial_registration' => 'nullable|string',
-            'tax_number' => 'nullable|string',
-            'logo' => 'nullable|image|mimes:png,jpg,jpeg|max:2048',
-
-            'latitude' => 'nullable|numeric|between:-90,90',
-            'longitude' => 'nullable|numeric|between:-180,180',
+            'city_id'                  => 'required_if:user_type,company|exists:cities,id',
+            'tax_number'               => 'required_if:user_type,company|string|max:255',
+            'commercial_registration'  => 'required_if:user_type,company|string|max:255',
+            'logo'                     => 'required_if:user_type,company|image|mimes:png,jpg,jpeg|max:2048',
+            'address'                  => 'required_if:user_type,company|string',
+            'website'                  => 'required_if:user_type,company|url|max:255',
+            'latitude'                 => 'required_if:user_type,company|numeric|between:-90,90',
+            'longitude'                => 'required_if:user_type,company|numeric|between:-180,180',
 
         ];
     }
@@ -61,15 +60,33 @@ class RegisterRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'name.required'      => 'الاسم مطلوب',
-            'phone.required'     => 'رقم الهاتف مطلوب',
-            'phone.unique'       => 'رقم الهاتف مسجل بالفعل',
-            'password.required'  => 'كلمة المرور مطلوبة',
-            'password.min'       => 'كلمة المرور يجب ألا تقل عن 6 أحرف',
-            'password.confirmed' => 'تأكيد كلمة المرور غير متطابق',
-            'logo.image'         => 'الملف المرفوع يجب أن يكون صورة',
-            'logo.mimes'         => 'امتداد الصورة يجب أن يكون png أو jpg أو jpeg',
-            'logo.max'           => 'حجم الصورة يجب ألا يزيد عن 2 ميجا بايت',
+            'name.required'              => 'الاسم مطلوب',
+            'phone.required'             => 'رقم الهاتف مطلوب',
+            'phone.unique'               => 'رقم الهاتف مسجل بالفعل',
+            'password.required'          => 'كلمة المرور مطلوبة',
+            'password.min'               => 'كلمة المرور يجب ألا تقل عن 6 أحرف',
+            'password.confirmed'         => 'تأكيد كلمة المرور غير متطابق',
+            'logo.image'                 => 'الملف المرفوع يجب أن يكون صورة',
+            'logo.mimes'                 => 'امتداد الصورة يجب أن يكون png أو jpg أو jpeg',
+            'logo.max'                   => 'حجم الصورة يجب ألا يزيد عن 2 ميجا بايت',
+
+            // رسائل الشركة
+            'user_type.required'         => 'نوع المستخدم مطلوب',
+            'user_type.in'               => 'نوع المستخدم يجب أن يكون user أو company',
+            'city_id.required_if'        => 'المدينة مطلوبة في حالة التسجيل كشركة',
+            'city_id.exists'             => 'المدينة غير موجودة',
+            'tax_number.required_if'     => 'الرقم الضريبي مطلوب في حالة التسجيل كشركة',
+            'commercial_registration.required_if' => 'السجل التجاري مطلوب في حالة التسجيل كشركة',
+            'logo.required_if'           => 'شعار الشركة مطلوب في حالة التسجيل كشركة',
+            'logo.image'                 => 'الملف المرفوع يجب أن يكون صورة',
+            'logo.mimes'                 => 'امتداد الصورة يجب أن يكون png أو jpg أو jpeg',
+            'logo.max'                   => 'حجم الصورة يجب ألا يزيد عن 2 ميجا بايت',
+            'address.required_if'        => 'العنوان مطلوب في حالة التسجيل كشركة',
+            'website.required_if'        => 'الموقع الإلكتروني مطلوب في حالة التسجيل كشركة',
+            'website.url'                => 'يجب إدخال رابط موقع إلكتروني صالح',
+            'latitude.required_if'       => 'خط العرض مطلوب في حالة التسجيل كشركة',
+            'longitude.required_if'      => 'خط الطول مطلوب في حالة التسجيل كشركة',
+
         ];
     }
 }

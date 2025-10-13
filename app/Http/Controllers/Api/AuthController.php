@@ -20,34 +20,23 @@ class AuthController extends Controller
     public function register(RegisterRequest $request)
     {
         $data = $request->validated();
-
+        $data['password'] = Hash::make($request->password);
+        // رفع الصورة لو موجودة
         if ($request->hasFile('logo')) {
-            $logoName = time() . '.' . $request->logo->extension();
-            $request->logo->move(public_path('uploads/users/logo'), $logoName);
-            $data['logo'] = 'uploads/users/logo/' . $logoName;
+            $extension = $request->logo->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '.' . $extension;
+            $request->logo->move(public_path('uploads/users'), $filename);
+            $data['logo'] = 'uploads/users/' . $filename;
         }
-
-        $user = User::create([
-
-            'name'                        => $request->name,
-            'phone'                       => $request->phone,
-            'password'                    => Hash::make($request->password),
-            'user_type'                   => 'user', // النوع دايمًا user
-            'address'                     => $request->address ?? null,
-            'city_id'                     => $request->city_id ?? null,
-            'commercial_registration'     => $request->commercial_registration ?? null,
-            'tax_number'                  => $request->tax_number ?? null,
-            'logo'                        => $data['logo'] ?? null,
-        ]);
+        $user = User::create($data);
         $otp = rand(1000, 9999);
         $user->update([
             'otp_code' => $otp,
             'otp_expires_at' => Carbon::now()->addMinutes(5),
         ]);
-
-
         return ApiResponse::SendResponse(200, 'OTP sent successfully. Please verify to complete registration.', [
             'phone' => $user->phone,
+            'otp_code'   => $user->otp_code,
             'is_verified' => false
         ]);
     }
@@ -60,7 +49,6 @@ class AuthController extends Controller
         }
 
         $user = Auth::user();
-
         // لو المستخدم لسه ما فعّلش رقم الموبايل
         if (!$user->is_verified) {
             return ApiResponse::SendResponse(403, 'Please verify your phone number first.', [
@@ -73,7 +61,6 @@ class AuthController extends Controller
         if ($user->is_verified) {
 
             $token = $user->createToken('myapptoken')->plainTextToken;
-
             return ApiResponse::SendResponse(200, 'Login successful', [
                 'user' => new UserResource($user),
                 'token' => $token,

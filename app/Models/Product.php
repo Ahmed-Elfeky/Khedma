@@ -16,31 +16,27 @@ class Product extends Model
         'desc',
         'discount',
         'guarantee',
-        
+
     ];
 
 
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
     public function subCategory()
     {
-        return $this->belongsTo(SubCategory::class);
+        return $this->belongsTo(SubCategory::class,'subcategory_id');
     }
 
     public function colors()
     {
-        return $this->hasMany(Color::class);
+        return $this->belongsToMany(Color::class, 'product_colors');
     }
 
     public function sizes()
     {
-        return $this->hasMany(Size::class);
+        return $this->belongsToMany(Size::class, 'product_sizes');
     }
 
-
-
+public function images(){
+    return $this->hasMany(ProductImage::class);
+}
 
 }
