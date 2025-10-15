@@ -5,29 +5,51 @@ namespace App\Http\Controllers\Api;
 use App\Helpers\ApiResponse;
 use App\Models\Product;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Api\ProductByCategoryRequest;
 use App\Http\Requests\Api\ProductRequest;
+use App\Http\Requests\Api\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Color;
 use App\Models\Size;
+use App\Models\SubCategory;
 use Illuminate\Http\Request;
 
 
 class ProductController extends Controller
 {
+
+
+
+public function index(){
+// استخدمت with عشان يبعت العلاقات مع المنتج في query واحدهبيكون اسرع
+     $products = Product::with(['images', 'colors', 'sizes'])->paginate(10);;
+        if (!$products) {
+            return ApiResponse::SendResponse(400, 'Not Product Found', []);
+        }
+        return ApiResponse::SendResponse(200, 'product Retrived Succsessfully',
+    [
+        'products' => ProductResource::collection($products->items()),
+        'pagination' => [ 
+            'current_page' => $products->currentPage(),
+            'last_page'    => $products->lastPage(),
+            'total'        => $products->total(),
+        ]
+    ] );
+    }
+
+
+
+
     public function store(ProductRequest $request)
     {
         $data = $request->validated();
-        // ✅ الصورة الرئيسية
+
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('uploads/products'), $imageName);
             $data['image'] = 'uploads/products/' . $imageName;
         }
-
-        //  إنشاء المنتج أولاً
         $product = Product::create($data);
-
-        //  رفع الصور الإضافية
         if ($request->hasFile('images')) {
             $images = [];
             foreach ($request->file('images') as $img) {
@@ -37,8 +59,66 @@ class ProductController extends Controller
             }
             $product->images()->createMany($images);
         }
+        if ($request->has('colors')) {
+            $colorIds = [];
+            foreach ($request->colors as $hex) {
+                $color = Color::firstOrCreate(['hex' => $hex]);
+                $colorIds[] = $color->id;
+            }
+            $product->colors()->sync($colorIds);
+        }
+        if ($request->has('sizes')) {
+            $sizeIds = [];
+            foreach ($request->sizes as $sizeName) {
+                $size = Size::firstOrCreate(['name' => $sizeName]);
+                $sizeIds[] = $size->id;
+            }
+            $product->sizes()->sync($sizeIds);
+        }
+        return ApiResponse::SendResponse(
+            201,
+            'Product added successfully',
+            new ProductResource($product->load('images', 'colors', 'sizes'))
+        );
+    }
 
-        // ✅ الألوان
+    public function update(UpdateProductRequest $request, $product)
+    {
+        $product = Product::find($product);
+
+        if (!$product) {
+            return ApiResponse::SendResponse(404, 'Product not found', []);
+        }
+
+        $data = $request->validated();
+        if ($request->hasFile('image')) {
+            $imageName = time() . '.' . $request->image->extension();
+            $request->image->move(public_path('uploads/products'), $imageName);
+            $data['image'] = 'uploads/products/' . $imageName;
+
+            if (!empty($product->image) && file_exists(public_path($product->image))) {
+                @unlink(public_path($product->image));
+            }
+        }
+        $product->update($data);
+
+        if ($request->hasFile('images')) {
+            foreach ($product->images as $img) {
+                if (file_exists(public_path($img->image))) {
+                    @unlink(public_path($img->image));
+                }
+                $img->delete();
+            }
+            foreach ($request->file('images') as $imageFile) {
+                $imageName = time() . '_' . uniqid() . '.' . $imageFile->extension();
+                $imageFile->move(public_path('uploads/products'), $imageName);
+
+                $product->images()->create([
+                    'image' => 'uploads/products/' . $imageName,
+                ]);
+            }
+        }
+
         if ($request->has('colors')) {
             $colorIds = [];
             foreach ($request->colors as $hex) {
@@ -48,20 +128,49 @@ class ProductController extends Controller
             $product->colors()->sync($colorIds);
         }
 
-        // ✅ المقاسات
         if ($request->has('sizes')) {
             $sizeIds = [];
-            foreach ($request->sizes as $sizeName) {
-                $size = Size::firstOrCreate(['name' => $sizeName]);
+            foreach ($request->sizes as $name) {
+                $size = Size::firstOrCreate(['name' => $name]);
                 $sizeIds[] = $size->id;
             }
             $product->sizes()->sync($sizeIds);
         }
-
+        $product->refresh();
         return ApiResponse::SendResponse(
-            201,
-            'Product added successfully',
+            200,
+            'Product updated successfully',
             new ProductResource($product->load('images', 'colors', 'sizes'))
         );
     }
+
+
+    public function show($id)
+    {
+        $product = Product::find($id);
+        if (!$product) {
+            return ApiResponse::SendResponse(400, 'Not Product Found', []);
+        }
+        return ApiResponse::SendResponse(200, 'product Retrived Succsessfully', new ProductResource($product));
+    }
+
+
+
+    public function getByCategory(ProductByCategoryRequest $request)
+    {
+        $category_id = $request->category_id;
+        $subcategoryIds = SubCategory::where('category_id', $category_id)->pluck('id');
+
+        $products = Product::with(['images', 'colors', 'sizes'])
+            ->whereIn('subcategory_id', $subcategoryIds)
+            ->get();
+        if (!$products) {
+             return ApiResponse::SendResponse(400,'Not Product Found',[]);
+        }
+        return ApiResponse::SendResponse(200,'Products fetched successfully',ProductResource::collection($products));
+    }
+
+
+
+
 }

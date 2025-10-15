@@ -17,7 +17,6 @@ class ProductResource extends JsonResource
             'price'      => (float)$this->price,
             'discount'   => $this->discount,
             'guarantee'  => $this->guarantee,
-            //  الصورة الرئيسية
             'image'      => $this->image ? url(asset($this->image)) : null,
             'images' => ImageResource::collection($this->images),
 

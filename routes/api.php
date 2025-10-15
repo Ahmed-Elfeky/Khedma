@@ -32,7 +32,10 @@ Route::get('categories', [CategoryController::class, 'index']);
 Route::get('colors', [ColorController::class, 'index']);
 Route::get('sizes', [SizeController::class, 'index']);
 Route::get('cities', [CityController::class, 'index']);
-Route::apiResource('product',ProductController::class );
+
+Route::get('/products/by-category', [ProductController::class, 'getByCategory']);
+Route::apiResource('products', ProductController::class );
+Route::post('products/{id}', [ProductController::class, 'update']);
 
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
