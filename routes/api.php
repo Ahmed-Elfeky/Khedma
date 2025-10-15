@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SizeController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 |
 */
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/products/update/{id}', [ProductController::class, 'update']);
+});
+
 
 Route::get('home', [HomeController::class, 'index']);
 
@@ -33,11 +39,6 @@ Route::get('colors', [ColorController::class, 'index']);
 Route::get('sizes', [SizeController::class, 'index']);
 Route::get('cities', [CityController::class, 'index']);
 
-Route::get('/products/by-category', [ProductController::class, 'getByCategory']);
 Route::apiResource('products', ProductController::class );
-Route::post('products/{id}', [ProductController::class, 'update']);
+Route::get('/products/by-category', [ProductController::class, 'getByCategory']);
 
-
-// Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-//     return $request->user();
-// });

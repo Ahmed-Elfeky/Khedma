@@ -20,25 +20,26 @@ class ProductController extends Controller
 
 
 
-public function index(){
-// استخدمت with عشان يبعت العلاقات مع المنتج في query واحدهبيكون اسرع
-     $products = Product::with(['images', 'colors', 'sizes'])->paginate(10);;
+    public function index()
+    {
+        // استخدمت with عشان يبعت العلاقات مع المنتج في query واحدهبيكون اسرع
+        $products = Product::with(['images', 'colors', 'sizes'])->paginate(10);;
         if (!$products) {
             return ApiResponse::SendResponse(400, 'Not Product Found', []);
         }
-        return ApiResponse::SendResponse(200, 'product Retrived Succsessfully',
-    [
-        'products' => ProductResource::collection($products->items()),
-        'pagination' => [ 
-            'current_page' => $products->currentPage(),
-            'last_page'    => $products->lastPage(),
-            'total'        => $products->total(),
-        ]
-    ] );
+        return ApiResponse::SendResponse(
+            200,
+            'product Retrived Succsessfully',
+            [
+                'products' => ProductResource::collection($products->items()),
+                'pagination' => [
+                    'current_page' => $products->currentPage(),
+                    'last_page'    => $products->lastPage(),
+                    'total'        => $products->total(),
+                ]
+            ]
+        );
     }
-
-
-
 
     public function store(ProductRequest $request)
     {
@@ -85,12 +86,10 @@ public function index(){
     public function update(UpdateProductRequest $request, $product)
     {
         $product = Product::find($product);
-
+        $data = $request->validated();
         if (!$product) {
             return ApiResponse::SendResponse(404, 'Product not found', []);
         }
-
-        $data = $request->validated();
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('uploads/products'), $imageName);
@@ -144,7 +143,6 @@ public function index(){
         );
     }
 
-
     public function show($id)
     {
         $product = Product::find($id);
@@ -154,23 +152,15 @@ public function index(){
         return ApiResponse::SendResponse(200, 'product Retrived Succsessfully', new ProductResource($product));
     }
 
-
-
     public function getByCategory(ProductByCategoryRequest $request)
     {
         $category_id = $request->category_id;
         $subcategoryIds = SubCategory::where('category_id', $category_id)->pluck('id');
-
         $products = Product::with(['images', 'colors', 'sizes'])
-            ->whereIn('subcategory_id', $subcategoryIds)
-            ->get();
+            ->whereIn('subcategory_id', $subcategoryIds)->get();
         if (!$products) {
-             return ApiResponse::SendResponse(400,'Not Product Found',[]);
+            return ApiResponse::SendResponse(400, 'Not Product Found', []);
         }
-        return ApiResponse::SendResponse(200,'Products fetched successfully',ProductResource::collection($products));
+        return ApiResponse::SendResponse(200, 'Products fetched successfully', ProductResource::collection($products));
     }
-
-
-
-
 }
