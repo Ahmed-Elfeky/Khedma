@@ -8,13 +8,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\ProductByCategoryRequest;
 use App\Http\Requests\Api\ProductRequest;
 use App\Http\Requests\Api\UpdateProductRequest;
+use App\Http\Requests\FilterRequest;
 use App\Http\Resources\ProductResource;
 use App\Models\Color;
 use App\Models\Size;
 use App\Models\SubCategory;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -192,5 +191,36 @@ class ProductController extends Controller
         $product->sizes()->detach();
         $product->delete();
         return ApiResponse::SendResponse(200, 'Product deleted successfully');
+    }
+
+    public function filter(FilterRequest $request)
+    {
+        $filters = $request->validated();
+
+        $query = Product::with(['images', 'colors', 'sizes']);
+
+        if (isset($filters['min_price']) && isset($filters['max_price'])) {
+            $query->whereBetween('price', [$filters['min_price'], $filters['max_price']]);
+        } elseif (isset($filters['min_price'])) {
+            $query->where('price', '>=', $filters['min_price']);
+        } elseif (isset($filters['max_price'])) {
+            $query->where('price', '<=', $filters['max_price']);
+        }
+
+        if (isset($filters['category_id'])) {
+            $query->where('category_id', $filters['category_id']);
+        }
+
+        $products = $query->latest()->paginate(10);
+
+        if ($products->isEmpty()) {
+            return ApiResponse::SendResponse(404, 'No products found for the selected filters', []);
+        }
+
+        return ApiResponse::SendResponse(
+            200,
+            'Products filtered successfully',
+            ProductResource::collection($products)
+        );
     }
 }
