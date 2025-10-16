@@ -22,6 +22,7 @@ class ProductRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'user_id'        => 'required|exists:users,id',
             'subcategory_id' => 'required|exists:subcategories,id',
             'name'           => 'required|string|max:255',
             'price'          => 'required|numeric|min:0',

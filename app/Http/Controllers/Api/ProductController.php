@@ -13,7 +13,8 @@ use App\Models\Color;
 use App\Models\Size;
 use App\Models\SubCategory;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
@@ -44,6 +45,7 @@ class ProductController extends Controller
     public function store(ProductRequest $request)
     {
         $data = $request->validated();
+        $data['user_id'] = auth()->id() ?? 1;
 
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
@@ -51,6 +53,7 @@ class ProductController extends Controller
             $data['image'] = 'uploads/products/' . $imageName;
         }
         $product = Product::create($data);
+
         if ($request->hasFile('images')) {
             $images = [];
             foreach ($request->file('images') as $img) {
@@ -154,13 +157,40 @@ class ProductController extends Controller
 
     public function getByCategory(ProductByCategoryRequest $request)
     {
-        $category_id = $request->category_id;
+
+        $category_id = $request->query('category_id');
         $subcategoryIds = SubCategory::where('category_id', $category_id)->pluck('id');
         $products = Product::with(['images', 'colors', 'sizes'])
             ->whereIn('subcategory_id', $subcategoryIds)->get();
-        if (!$products) {
-            return ApiResponse::SendResponse(400, 'Not Product Found', []);
+        if ($products->isEmpty()) {
+            return ApiResponse::SendResponse(404, 'Not Product Found', []);
         }
         return ApiResponse::SendResponse(200, 'Products fetched successfully', ProductResource::collection($products));
+    }
+
+    public function destroy($id)
+    {
+        //  البحث عن المنتج مع الصور لتقليل الاستعلامات
+        $product = Product::with('images')->find($id);
+        if (!$product) {
+            return ApiResponse::SendResponse(404, 'Product not found', []);
+        }
+        if (Auth::id() !== $product->user_id) {
+            return ApiResponse::SendResponse(403, 'You are not authorized to delete this product', []);
+        }
+        if ($product->image && file_exists(public_path($product->image))) {
+            unlink(public_path($product->image));
+        }
+        foreach ($product->images as $image) {
+            $imagePath = public_path($image->image);
+            if ($image->image && file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+            $image->delete();
+        }
+        $product->colors()->detach();
+        $product->sizes()->detach();
+        $product->delete();
+        return ApiResponse::SendResponse(200, 'Product deleted successfully');
     }
 }

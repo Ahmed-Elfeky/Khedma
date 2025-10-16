@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/products/update/{id}', [ProductController::class, 'update']);
+    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::apiResource('products', ProductController::class);
 });
 
 
@@ -39,6 +41,4 @@ Route::get('colors', [ColorController::class, 'index']);
 Route::get('sizes', [SizeController::class, 'index']);
 Route::get('cities', [CityController::class, 'index']);
 
-Route::apiResource('products', ProductController::class );
-Route::get('/products/by-category', [ProductController::class, 'getByCategory']);
-
+Route::get('products/by-category', [ProductController::class, 'getByCategory']);

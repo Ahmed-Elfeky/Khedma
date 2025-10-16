@@ -16,10 +16,13 @@ class Product extends Model
         'desc',
         'discount',
         'guarantee',
+        'user_id'
 
     ];
 
-
+public function user(){
+    return $this->belongsTo(User::class);
+}
     public function subCategory()
     {
         return $this->belongsTo(SubCategory::class,'subcategory_id');

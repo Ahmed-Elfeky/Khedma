@@ -4,11 +4,23 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\Product;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class ProductSeeder extends Seeder
 {
     public function run(): void
     {
+        $user = User::firstOrCreate(
+            ['phone' => '01099696706'], // شرط البحث
+            [
+                'name' => 'Admin',
+                'password' => Hash::make('123456'),
+                'user_type' => 'admin',
+                'city_id' => null,
+                'address' => 'Cairo',
+            ]
+        );
         $products = [
             [
                 'subcategory_id' => 1,
@@ -16,6 +28,8 @@ class ProductSeeder extends Seeder
                 'desc' => 'High performance laptop with 16GB RAM and 512GB SSD.',
                 'price' => 1500.00,
                 'stock' => 1,
+                'user_id' => $user->id,
+
             ],
             [
                 'subcategory_id' => 1,
@@ -23,6 +37,8 @@ class ProductSeeder extends Seeder
                 'desc' => 'Latest smartphone with AMOLED display and triple camera.',
                 'price' => 900.00,
                 'stock' => 1,
+                'user_id' => $user->id,
+
             ],
             [
                 'subcategory_id' => 2,
@@ -30,6 +46,7 @@ class ProductSeeder extends Seeder
                 'desc' => 'Tshirt man and woman.',
                 'price' => 250.00,
                 'stock' => 1,
+                'user_id' => $user->id,
             ],
             [
                 'subcategory_id' => 1,
@@ -37,6 +54,8 @@ class ProductSeeder extends Seeder
                 'desc' => 'Waterproof smartwatch with fitness tracking.',
                 'price' => 300.00,
                 'stock' => 1,
+                'user_id' => $user->id,
+
 
             ],
         ];
