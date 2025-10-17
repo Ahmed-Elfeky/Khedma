@@ -11,23 +11,32 @@ class ProductResource extends JsonResource
 
     public function toArray(Request $request): array
     {
-        $user = Auth::user();
+        $user = auth()->user();
+
+        // نتحقق هل المنتج في المفضلة للمستخدم الحالي
+        $isFavourite = false;
+
+        if ($user) {
+            $isFavourite = $user->favourites()
+                ->where('product_id', $this->id)
+                ->exists();
+        }
 
         return [
-            'id'         => $this->id,
-            'name'       => $this->name,
-            'desc'       => $this->desc,
-            'price'      => (float)$this->price,
-            'discount'   => $this->discount,
-            'guarantee'  => $this->guarantee,
-            'image'      => $this->image ? url(asset($this->image)) : null,
-            'images' => ImageResource::collection($this->images),
-
+            'id'              => $this->id,
+            'name'            => $this->name,
+            'desc'            => $this->desc,
+            'price'           => (float)$this->price,
+            'discount'        => $this->discount,
+            'guarantee'       => $this->guarantee,
+            'image'           => $this->image ? url(asset($this->image)) : null,
+            'images'          => ImageResource::collection($this->images),
+            'is_favourite'    => $isFavourite,
             //  العلاقات
-            'sizes'      => SizeResource::collection($this->sizes),
-            'colors'     => ColorResource::collection($this->colors),
-            'subcategory' => new SubCategoryResource($this->subCategory),
-           
+            'sizes'           => SizeResource::collection($this->sizes),
+            'colors'          => ColorResource::collection($this->colors),
+            'subcategory'     => new SubCategoryResource($this->subCategory),
+
 
         ];
     }

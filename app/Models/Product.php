@@ -42,4 +42,8 @@ public function images(){
     return $this->hasMany(ProductImage::class);
 }
 
+public function cart(){
+    return $this->hasMany(Cart::class);
+}
+
 }

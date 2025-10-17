@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\BannerController;
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\ColorController;
@@ -23,10 +24,14 @@ use Illuminate\Support\Facades\Route;
 Route::get('/products/filter', [ProductController::class, 'filter']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/products/update/{id}', [ProductController::class, 'update']);
+    Route::post('products/update/{id}', [ProductController::class, 'update']);
     Route::delete('/products/{id}', [ProductController::class, 'destroy']);
     Route::apiResource('products', ProductController::class);
     Route::apiResource('favourites', FavouriteController::class);
+    // Cart Routes //
+    Route::get('cart', [CartController::class, 'index']);
+    Route::post('cart', [CartController::class, 'store']);
+    Route::delete('cart/{id}', [CartController::class, 'destroy']);
 });
 
 

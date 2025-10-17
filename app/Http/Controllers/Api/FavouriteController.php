@@ -6,6 +6,7 @@ use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreFavouriteRequest;
 use App\Http\Resources\FavouriteResource;
+use App\Http\Resources\ProductResource;
 use App\Models\Favourite;
 use Illuminate\Support\Facades\Auth;
 
@@ -14,33 +15,60 @@ class FavouriteController extends Controller
     public function index()
     {
         $userId = Auth::id();
-        $favourites = Favourite::with('product')
-            ->where('user_id', $userId)->latest()->get();
+        if (!$userId) {
+            return ApiResponse::SendResponse(401, 'Unauthorized', []);
+        }
+        $favourites = Favourite::with('product.images', 'product.colors', 'product.sizes')
+            ->where('user_id', $userId)
+            ->latest()
+            ->get();
 
         if ($favourites->isEmpty()) {
             return ApiResponse::SendResponse(404, 'No favourite products found', []);
         }
-        return ApiResponse::SendResponse(200, 'Favourite products retrieved successfully', FavouriteResource::collection($favourites));
-    }
+        // نرجّع المنتجات نفسها فقط
+        $products = $favourites->pluck('product')->filter();
 
+        return ApiResponse::SendResponse(
+            200,
+            'Favourite products retrieved successfully',
+            ProductResource::collection($products)
+        );
+    }
 
 
     public function store(StoreFavouriteRequest $request)
     {
         $data = $request->validated();
         $userId = Auth::id();
-        $productId = $request->product_id;
-        // تحقق هل المنتج موجود فعلاً في المفضلة
+        $productId = (int) $request->product_id;
+
+        if (!$userId) {
+            return ApiResponse::SendResponse(401, 'Unauthorized', []);
+        }
+
         $existingFav = Favourite::where('user_id', $userId)
-            ->where('product_id', $productId)->first();
+            ->where('product_id', $productId)
+            ->first();
 
         if ($existingFav) {
-            //  لو موجود نحذفه (toggle off)
             $existingFav->delete();
-            return ApiResponse::SendResponse(200, 'Product removed from favourites', []);
+
+            return ApiResponse::SendResponse(200, 'Product removed from favourites', [
+                'product_id' => $productId,
+                'is_favourite' => false,
+            ]);
         }
-        //  لو غير موجود نضيفه (toggle on)
-        $fav = Favourite::create($data);
-        return ApiResponse::SendResponse(200, 'Product added to favourites', new FavouriteResource($fav));
+
+        $fav = Favourite::create([
+            'user_id' => $userId,
+            'product_id' => $productId,
+        ]);
+
+        return ApiResponse::SendResponse(
+            200,
+            'Product added to favourites',
+            new ProductResource($fav->product)
+        );
     }
 }
