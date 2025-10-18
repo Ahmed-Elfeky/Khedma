@@ -13,6 +13,7 @@ class Product extends Model
         'name',
         'image',
         'price',
+        'stock',
         'desc',
         'discount',
         'guarantee',
@@ -45,5 +46,12 @@ public function images(){
 public function cart(){
     return $this->hasMany(Cart::class);
 }
+public function orders()
+{
+    return $this->belongsToMany(Order::class, 'order_items')
+                ->withPivot('quantity', 'price')
+                ->withTimestamps();
+}
+
 
 }

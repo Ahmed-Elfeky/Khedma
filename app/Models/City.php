@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class City extends Model
 {
     use HasFactory;
-    protected $fillable = ['name'];
 
+    protected $fillable = ['name', 'shipping_price'];
 
-
-
-
-
+    public function users()
+    {
+        return $this->hasMany(User::class);
+    }
 }

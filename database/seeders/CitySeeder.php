@@ -14,9 +14,9 @@ class CitySeeder extends Seeder
     public function run(): void
     {
         $cities = [
-            ['name' => 'cairo'],
-            ['name' => 'Alx'],
-            ['name' => 'Mansoura'],
+            ['name' => 'Cairo', 'shipping_price' => 30.00],
+            ['name' => 'Alexandria', 'shipping_price' => 35.00],
+            ['name' => 'Mansoura', 'shipping_price' => 25.00],
         ];
         City::insert($cities);
     }

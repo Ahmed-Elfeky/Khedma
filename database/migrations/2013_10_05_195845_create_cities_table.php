@@ -12,6 +12,7 @@ return new class extends Migration
         Schema::create('cities', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->decimal('shipping_price', 8, 2)->default(0); //  سعر الشحن لكل مدينة
             $table->timestamps();
         });
     }

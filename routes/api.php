@@ -9,6 +9,7 @@ use App\Http\Controllers\Api\ColorController;
 use App\Http\Controllers\Api\ComplaintController;
 use App\Http\Controllers\Api\FavouriteController;
 use App\Http\Controllers\Api\HomeController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\SizeController;
 use Illuminate\Http\Request;
@@ -32,6 +33,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('cart', [CartController::class, 'index']);
     Route::post('cart', [CartController::class, 'store']);
     Route::delete('cart/{id}', [CartController::class, 'destroy']);
+
+    // Orders Routes //
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::get('orders/{id}', [OrderController::class, 'show']);
+    Route::post('orders', [OrderController::class, 'store']);
 });
 
 

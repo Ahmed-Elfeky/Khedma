@@ -30,6 +30,7 @@ class ProductRequest extends FormRequest
             'discount'       => 'nullable|numeric|min:0|max:100',
             'guarantee'      => 'nullable|string|max:255',
             'image'          => 'nullable|image|mimes:jpeg,png,jpg,webp,gif|max:2048',
+            'stock'          => 'required|integer|min:0',
 
             'colors'         => 'nullable|array',
             'colors.*'       => 'string|distinct|regex:/^#([A-Fa-f0-9]{6})$/',
