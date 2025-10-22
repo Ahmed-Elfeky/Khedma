@@ -10,6 +10,7 @@ use App\Models\City;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\ApiResponse;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -26,7 +27,7 @@ class OrderController extends Controller
         if (!$userId) {
             return ApiResponse::SendResponse(401, 'Unauthorized', []);
         }
-
+      
         $cartItems = Cart::with('product')->where('user_id', $userId)->get();
 
         if ($cartItems->isEmpty()) {
@@ -136,4 +137,5 @@ class OrderController extends Controller
             new OrderResource($order)
         );
     }
+
 }

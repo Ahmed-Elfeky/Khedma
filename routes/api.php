@@ -24,9 +24,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/products/filter', [ProductController::class, 'filter']);
 
-Route::middleware('auth:sanctum')->group(function () {
+//******************** Company MiddleWare  ********************//
+Route::middleware('auth:sanctum','company')->group(function () {
+    Route::post('products/store', [ProductController::class, 'store']);
     Route::post('products/update/{id}', [ProductController::class, 'update']);
-    Route::delete('/products/{id}', [ProductController::class, 'destroy']);
+    Route::delete('/products/destroy/{id}', [ProductController::class, 'destroy']);
+
+});
+Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('products', ProductController::class);
     Route::apiResource('favourites', FavouriteController::class);
     // Cart Routes //

@@ -21,7 +21,7 @@ class User extends Authenticatable
         'otp_code',
         'otp_expires_at',
         'is_verified',
-        'user_type',
+        'role',
         'address',
         'city_id',
         'website',

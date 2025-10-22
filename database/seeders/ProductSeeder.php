@@ -16,7 +16,7 @@ class ProductSeeder extends Seeder
             [
                 'name' => 'Admin',
                 'password' => Hash::make('123456'),
-                'user_type' => 'admin',
+                'role' => 'admin',
                 'city_id' => null,
                 'address' => 'Cairo',
             ]

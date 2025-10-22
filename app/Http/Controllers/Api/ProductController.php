@@ -43,9 +43,12 @@ class ProductController extends Controller
 
     public function store(ProductRequest $request)
     {
+        $user = Auth::user();
         $data = $request->validated();
         $data['user_id'] = auth()->id() ?? 1;
-
+        if ($user->role !== 'company') {
+            return ApiResponse::SendResponse(403, 'Access denied. Only companies can add products.', []);
+        }
         if ($request->hasFile('image')) {
             $imageName = time() . '.' . $request->image->extension();
             $request->image->move(public_path('uploads/products'), $imageName);

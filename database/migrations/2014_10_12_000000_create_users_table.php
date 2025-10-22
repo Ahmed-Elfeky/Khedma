@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('otp_code')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('is_verified')->default(false);
-            $table->string('user_type')->default('user'); // user or company
+            $table->enum('role', ['user', 'company','admin'])->default('user');
             // بيانات الشركة (في حالة كان user_type = company)
             $table->string('address')->nullable();           // العنوان
             $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('set null');
