@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-//  Public Routes (بدون تسجيل دخول)
+// =================== Public Routes (بدون تسجيل دخول) =================== //
 Route::get('home', [HomeController::class, 'index']);
 Route::get('banners', [BannerController::class, 'index']);
 Route::get('categories', [CategoryController::class, 'index']);
@@ -33,7 +33,7 @@ Route::get('products', [ProductController::class, 'index']);
 Route::get('products/{id}', [ProductController::class, 'show']);
 Route::post('complaints', [ComplaintController::class, 'store']);
 
-// Authentication Routes
+// =================== Authentication Routes =================== //
 Route::controller(AuthController::class)->group(function () {
     Route::post('register', 'register');
     Route::post('login', 'login');
@@ -42,28 +42,33 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('logout', 'logout')->middleware('auth:sanctum');
 });
 
-// Routes for logged-in users
+//  /// =================== Protected Routes (تحتاج تسجيل دخول) =================== /
 Route::middleware('auth:sanctum')->group(function () {
-    //  User routes
+
+    // ---------- Routes لجميع المستخدمين بعد تسجيل الدخول ---------- //
     Route::apiResource('favourites', FavouriteController::class);
     Route::get('cart', [CartController::class, 'index']);
-    Route::post('cart', [CartController::class, 'store']);
     Route::delete('cart/{id}', [CartController::class, 'destroy']);
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{id}', [OrderController::class, 'show']);
-    Route::post('orders', [OrderController::class, 'store']);
 
-    //  Company routes (protected by middleware company)
+    // ---------- User Routes (محمي بـ middleware user) ---------- //
+    Route::middleware('user')->group(function () {
+        Route::post('orders', [OrderController::class, 'store']);
+        Route::get('my-orders', [OrderController::class, 'myOrders']);
+        Route::post('cart', [CartController::class, 'store']);
+    });
+
+    // ---------- Company Routes (محمي بـ middleware company) ---------- //
     Route::middleware('company')->group(function () {
         Route::post('products/store', [ProductController::class, 'store']);
         Route::post('products/update/{id}', [ProductController::class, 'update']);
         Route::delete('products/destroy/{id}', [ProductController::class, 'destroy']);
     });
 
-    //  Admin routes (optional future use)
+    // ---------- Admin Routes (محمي بـ middleware admin) ---------- //
     Route::middleware('admin')->group(function () {
-    //     // admin-specific routes
-    //     Route::get('admin/dashboard', [AdminController::class, 'dashboard']);
-    // Route::delete('admin/delete-user/{id}', [AdminController::class, 'destroyUser']);
+        // Route::get('admin/dashboard', [AdminController::class, 'dashboard']);
+        // Route::delete('admin/delete-user/{id}', [AdminController::class, 'destroyUser']);
     });
 });

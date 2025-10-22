@@ -25,11 +25,6 @@ class OrderResource extends JsonResource
                     return [
                         'id' => $product->id,
                         'name' => $product->name,
-                        'price' => (float) $product->price,
-                        'discount' => (float) $product->discount,
-                        'final_price' => (float) ($product->price - ($product->discount ?? 0)),
-                        'quantity' => $product->pivot?->quantity,
-                        'image' => $product->image ? url($product->image) : null,
                     ];
                 });
             }),

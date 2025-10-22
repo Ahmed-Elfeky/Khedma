@@ -27,7 +27,7 @@ class OrderController extends Controller
         if (!$userId) {
             return ApiResponse::SendResponse(401, 'Unauthorized', []);
         }
-      
+
         $cartItems = Cart::with('product')->where('user_id', $userId)->get();
 
         if ($cartItems->isEmpty()) {
@@ -35,6 +35,9 @@ class OrderController extends Controller
         }
 
         $city = City::find($request->city_id);
+        if (!$city) {
+            return ApiResponse::SendResponse(404, 'City not found', []);
+        }
         $shipping = $city->shipping_price;
 
         DB::beginTransaction();
@@ -93,15 +96,58 @@ class OrderController extends Controller
         }
     }
 
-    /**
-     * عرض كل الطلبات للمستخدم الحالي
-     */
+
+
     public function index()
     {
-        $userId = Auth::id();
+        $user = Auth::user();
 
-        $orders = Order::with(['products', 'city'])
-            ->where('user_id', $userId)
+        if (!$user) {
+            return ApiResponse::SendResponse(401, 'Unauthorized', []);
+        }
+
+        switch ($user->role) {
+            case 'admin':
+                $orders = Order::with(['orderItems.product', 'user'])
+                    ->latest()
+                    ->get();
+                break;
+
+            case 'company':
+                $orders = Order::whereHas('orderItems.product', function ($q) use ($user) {
+                    $q->where('user_id', $user->id);
+                })
+                    ->with(['orderItems.product', 'user'])
+                    ->latest()
+                    ->get();
+                break;
+
+            default: // user
+                $orders = Order::where('user_id', $user->id)
+                    ->with(['orderItems.product', 'city'])
+                    ->latest()
+                    ->get();
+        }
+
+        if ($orders->isEmpty()) {
+            return ApiResponse::SendResponse(404, 'No orders found', []);
+        }
+
+        return ApiResponse::SendResponse(
+            200,
+            'Orders retrieved successfully',
+            $orders
+        );
+    }
+
+
+
+    public function myOrders()
+    {
+        $user = auth()->user();
+        // جلب الطلبات الخاصة بالمستخدم مع تفاصيلها (المنتجات، المدينة، إلخ)
+        $orders = Order::with(['orderItems.product', 'city'])
+            ->where('user_id', $user->id)
             ->latest()
             ->get();
 
@@ -111,10 +157,11 @@ class OrderController extends Controller
 
         return ApiResponse::SendResponse(
             200,
-            'Orders retrieved successfully',
+            'User orders retrieved successfully',
             OrderResource::collection($orders)
         );
     }
+
 
     /**
      * عرض تفاصيل طلب واحد
@@ -125,7 +172,7 @@ class OrderController extends Controller
 
         $order = Order::with(['products', 'city'])
             ->where('user_id', $userId)
-            ->find($id);
+            ->findOrFail($id);
 
         if (!$order) {
             return ApiResponse::SendResponse(404, 'Order not found', []);
@@ -137,5 +184,4 @@ class OrderController extends Controller
             new OrderResource($order)
         );
     }
-
 }

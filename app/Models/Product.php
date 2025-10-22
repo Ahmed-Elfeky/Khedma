@@ -21,12 +21,14 @@ class Product extends Model
 
     ];
 
-public function user(){
-    return $this->belongsTo(User::class);
-}
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function subCategory()
     {
-        return $this->belongsTo(SubCategory::class,'subcategory_id');
+        return $this->belongsTo(SubCategory::class, 'subcategory_id');
     }
 
     public function colors()
@@ -39,19 +41,19 @@ public function user(){
         return $this->belongsToMany(Size::class, 'product_sizes');
     }
 
-public function images(){
-    return $this->hasMany(ProductImage::class);
-}
+    public function images()
+    {
+        return $this->hasMany(ProductImage::class);
+    }
 
-public function cart(){
-    return $this->hasMany(Cart::class);
-}
-public function orders()
-{
-    return $this->belongsToMany(Order::class, 'order_items')
-                ->withPivot('quantity', 'price')
-                ->withTimestamps();
-}
-
-
+    public function cart()
+    {
+        return $this->hasMany(Cart::class);
+    }
+    public function orders()
+    {
+        return $this->belongsToMany(Order::class, 'order_items')
+            ->withPivot('quantity', 'price')
+            ->withTimestamps();
+    }
 }
