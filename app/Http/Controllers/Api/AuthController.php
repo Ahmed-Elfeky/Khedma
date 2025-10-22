@@ -21,6 +21,7 @@ class AuthController extends Controller
     {
         $data = $request->validated();
         $data['password'] = Hash::make($request->password);
+
         // رفع الصورة لو موجودة
         if ($request->hasFile('logo')) {
             $extension = $request->logo->getClientOriginalExtension();
@@ -28,12 +29,14 @@ class AuthController extends Controller
             $request->logo->move(public_path('uploads/users'), $filename);
             $data['logo'] = 'uploads/users/' . $filename;
         }
+
         $user = User::create($data);
         $otp = rand(1000, 9999);
         $user->update([
             'otp_code' => $otp,
             'otp_expires_at' => Carbon::now()->addMinutes(5),
         ]);
+
         return ApiResponse::SendResponse(200, 'OTP sent successfully. Please verify to complete registration.', [
             'phone' => $user->phone,
             'otp_code'   => $user->otp_code,
