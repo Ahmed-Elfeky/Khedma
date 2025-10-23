@@ -46,11 +46,17 @@ Route::controller(AuthController::class)->group(function () {
 Route::middleware('auth:sanctum')->group(function () {
 
     // ---------- Routes لجميع المستخدمين بعد تسجيل الدخول ---------- //
+    Route::get('orders/filter', [OrderController::class, 'filterOrders']);
+    Route::get('orders/current', [OrderController::class, 'currentOrders']);
+    Route::get('orders/previous', [OrderController::class, 'previousOrders']);
+    Route::get('orders/companyOrderedProducts', [OrderController::class, 'companyOrderedProducts']);
+
     Route::apiResource('favourites', FavouriteController::class);
     Route::get('cart', [CartController::class, 'index']);
     Route::delete('cart/{id}', [CartController::class, 'destroy']);
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{id}', [OrderController::class, 'show']);
+
 
     // ---------- User Routes (محمي بـ middleware user) ---------- //
     Route::middleware('user')->group(function () {

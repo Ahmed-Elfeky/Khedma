@@ -10,6 +10,8 @@ use App\Models\City;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\ApiResponse;
+use App\Http\Resources\ProductResource;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -96,8 +98,6 @@ class OrderController extends Controller
         }
     }
 
-
-
     public function index()
     {
         $user = Auth::user();
@@ -140,7 +140,46 @@ class OrderController extends Controller
         );
     }
 
+    public function filterOrders(Request $request)
+    {
+        $user = Auth::user();
+        // لو المستخدم شركة، نشوف الطلبات اللي تخص منتجاته فقط
+        if ($user->role === 'company') {
+            $orders = Order::whereHas('orderItems.product', function ($q) use ($user) {
+                $q->where('user_id', $user->id);
+            });
+        } else {
+            // لو عميل عادي، نجيب طلباته فقط
+            $orders = Order::where('user_id', $user->id);
+        }
 
+        //  التصفية حسب الحالة (status)
+        if ($request->filled('status') && $request->status !== 'all') {
+            $orders->where('status', $request->status);
+        }
+
+        //  التصفية حسب التاريخ
+        if ($request->filled('date')) {
+            $orders->whereDate('created_at', $request->date);
+        }
+
+        $orders = $orders->with('orderItems.product')->latest()->get();
+        return ApiResponse::SendResponse(200, 'Filtered orders fetched successfully', OrderResource::collection($orders));
+    }
+
+    public function companyOrderedProducts()
+    {
+        $user = Auth::user();
+
+        if ($user->role !== 'company') {
+            return ApiResponse::SendResponse(403, 'Unauthorized', []);
+        }
+        // جلب كل المنتجات اللي اتعملت عليها طلبات من الشركة الحالية
+        $products = Product::where('user_id', $user->id)
+            ->whereHas('orders') // فقط المنتجات اللي تم طلبها فعلاً
+            ->get();
+        return ApiResponse::SendResponse(200, 'Company ordered products fetched successfully', ProductResource::collection($products));
+    }
 
     public function myOrders()
     {
@@ -162,6 +201,25 @@ class OrderController extends Controller
         );
     }
 
+    // الطلبات الحالية (ليست مكتملة بعد)
+    public function currentOrders()
+    {
+        $orders = Order::where('user_id', Auth::id())
+            ->whereIn('status', ['pending', 'processing'])
+            ->latest()
+            ->get();
+        return apiResponse::SendResponse(200, 'Current orders retrieved successfully', OrderResource::collection($orders));
+    }
+
+    // الطلبات السابقة (تم تسليمها)
+    public function previousOrders()
+    {
+        $orders = Order::where('user_id', Auth::id())
+            ->where('status', 'delivered')
+            ->latest()
+            ->get();
+        return apiResponse::SendResponse(200, 'Previous orders retrieved successfully', OrderResource::collection($orders));
+    }
 
     /**
      * عرض تفاصيل طلب واحد
