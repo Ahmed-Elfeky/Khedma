@@ -44,6 +44,7 @@ Route::controller(AuthController::class)->group(function () {
 
 //  /// =================== Protected Routes (تحتاج تسجيل دخول) =================== /
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('profile-update', [AuthController::class ,'updateProfile']);
 
     // ---------- Routes لجميع المستخدمين بعد تسجيل الدخول ---------- //
     Route::get('orders/filter', [OrderController::class, 'filterOrders']);
@@ -70,11 +71,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('products/store', [ProductController::class, 'store']);
         Route::post('products/update/{id}', [ProductController::class, 'update']);
         Route::delete('products/destroy/{id}', [ProductController::class, 'destroy']);
-    });
-
-    // ---------- Admin Routes (محمي بـ middleware admin) ---------- //
-    Route::middleware('admin')->group(function () {
-        // Route::get('admin/dashboard', [AdminController::class, 'dashboard']);
-        // Route::delete('admin/delete-user/{id}', [AdminController::class, 'destroyUser']);
     });
 });

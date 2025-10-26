@@ -11,8 +11,6 @@ class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    protected $appends = ['is_verified'];
-
 
     protected $fillable = [
         'name',
@@ -32,7 +30,9 @@ class User extends Authenticatable
         'latitude'
     ];
 
-
+  protected $casts = [
+        'is_verified' => 'boolean',
+    ];
 
     public function products()
     {
@@ -43,10 +43,6 @@ class User extends Authenticatable
     {
         return $this->hasMany(Favourite::class);
     }
-    // public function items()
-    // {
-    //     return $this->hasMany(OrderItem::class);
-    // }
 
     public function city()
     {
@@ -64,12 +60,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+   
+
 }

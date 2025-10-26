@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Api\LoginRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Requests\VerifyOtpRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -73,7 +74,6 @@ class AuthController extends Controller
         }
     }
 
-
     public function sendOtp(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -99,20 +99,20 @@ class AuthController extends Controller
     {
         $user = User::where('phone', $request->phone)->first();
 
-        // 1️⃣ لو مفيش مستخدم بالرقم ده
+        // لو مفيش مستخدم بالرقم ده
         if (!$user) {
             return ApiResponse::SendResponse(404, 'User not found.', [
                 'is_verified' => false
             ]);
         }
-        // 2️⃣ لو المستخدم عمره ما اتبعت له OTP
+        //  لو المستخدم عمره ما اتبعت له OTP
         if (is_null($user->otp_code) || is_null(!$user->otp_expires_at)) {
             return ApiResponse::SendResponse(400, 'No OTP was sent to this number. Please request a new code.', [
                 'is_verified' => false
             ]);
         }
 
-        // 3️⃣ لو الكود انتهت صلاحيته
+        //  لو الكود انتهت صلاحيته
         if ($user->otp_expires_at < now()) {
 
             return ApiResponse::SendResponse(400, 'OTP has expired. Please request a new one.', [
@@ -120,14 +120,14 @@ class AuthController extends Controller
             ]);
         }
 
-        // 4️⃣ لو الكود غلط
+        //  لو الكود غلط
         if ($user->otp_code !== $request->otp_code) {
             return ApiResponse::SendResponse(400, 'Incorrect OTP code.', [
                 'is_verified' => false
             ]);
         }
 
-        // ✅ 5️⃣ الكود صحيح → نتحقق وننظف القيم
+        // الكود صحيح → نتحقق وننظف القيم
         $user->update([
             'otp_code' => null,
             'otp_expires_at' => null,
@@ -147,6 +147,50 @@ class AuthController extends Controller
     }
 
     //............... opt code end ................//
+
+    public function updateProfile(UpdateProfileRequest $request)
+    {
+        $user = Auth::user();
+        $data = $request->validated();
+        $phoneChanged = false;
+
+        // 🔸 لو غيّر رقم الهاتف، نحضر OTP جديد
+        if ($request->filled('phone') && $request->phone !== $user->phone) {
+            $phoneChanged = true;
+            $otp = rand(1000, 9999);
+            $data['otp_code'] = $otp;
+            $data['otp_expires_at'] = now()->addMinutes(5);
+            $data['is_verified'] = false; // لو عندك عمود التحقق
+        }
+        // تحديث كلمة المرور إن وُجدت
+        if ($request->filled('password')) {
+            $data['password'] = Hash::make($request->password);
+        }
+
+        if ($request->hasFile('logo')) {
+            $extension = $request->logo->getClientOriginalExtension();
+            $filename = time() . '_' . uniqid() . '.' . $extension;
+            $request->logo->move(public_path('uploads/users'), $filename);
+            $data['logo'] = 'uploads/users/' . $filename;
+        }
+        $user->update($data);
+        // لو تم تغيير رقم الهاتف → نرسل OTP
+        if ($phoneChanged) {
+            // هنا تقدر تبعت SMS أو تحفظه مبدئيًا فقط
+            return ApiResponse::SendResponse(200, 'تم تحديث الملف بنجاح، يرجى إدخال كود التحقق المرسل إلى رقمك الجديد.', [
+                'phone' => $user->phone,
+                'otp_code' => $data['otp_code'], //  (للتجربة فقط، لا تُظهره في الإنتاج)
+                'is_verified' => false,
+            ]);
+        }
+
+        return ApiResponse::SendResponse(200, 'تم تحديث الملف الشخصي بنجاح', [
+            'user' => $user,
+        ]);
+    }
+
+
+
 
     // logout //
     public function logout()

@@ -12,7 +12,6 @@ class FilterRequest extends FormRequest
     public function authorize(): bool
     {
         return true;
-
     }
 
     public function rules(): array
@@ -21,7 +20,7 @@ class FilterRequest extends FormRequest
 
             'min_price' => 'nullable|numeric|min:0',
             'max_price' => 'nullable|numeric|min:0',
-             ];
+        ];
     }
 
     public function messages(): array
@@ -30,6 +29,5 @@ class FilterRequest extends FormRequest
             'min_price.numeric' => 'Minimum price must be a valid number.',
             'max_price.numeric' => 'Maximum price must be a valid number.',
         ];
-
-}
+    }
 }
