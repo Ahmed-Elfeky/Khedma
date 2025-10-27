@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <!--begin::Head-->
-@include('dashboard.layouts.header')
+@include('admin.layouts.header')
 <!--end::Head-->
 <!--begin::Body-->
 
@@ -9,15 +9,15 @@
     <!--begin::App Wrapper-->
     <div class="app-wrapper">
         <!--begin::Header-->
-        @include('dashboard.layouts.mainheader')
+        @include('admin.layouts.mainheader')
         <!--end::Header-->
         <!--begin::Sidebar-->
-        @include('dashboard.layouts.sidebar')
+        @include('admin.layouts.sidebar')
         <!--end::Sidebar-->
         <!--begin::App Main-->
         <main class="app-main">
             <!--begin::App Content Header-->
-          @include('dashboard.layouts.content-header')
+          @include('admin.layouts.content-header')
             <!--end::App Content Header-->
             <!--begin::App Content-->
            @yield('content')
@@ -25,13 +25,13 @@
         </main>
         <!--end::App Main-->
         <!--begin::Footer-->
-        @include('dashboard.layouts.footer')
+        @include('admin.layouts.footer')
         <!--end::Footer-->
     </div>
     <!--end::App Wrapper-->
     <!--begin::Script-->
     <!--begin::Third Party Plugin(OverlayScrollbars)-->
-    @include('dashboard.layouts.script')
+    @include('admin.layouts.script')
     <!--end::Script-->
 </body>
 <!--end::Body-->

@@ -11,7 +11,7 @@
             />
             <!--end::Brand Image-->
             <!--begin::Brand Text-->
-            <span class="brand-text fw-light">AdminLTE 4</span>
+            <span class="brand-text fw-light">Khedma </span>
             <!--end::Brand Text-->
           </a>
           <!--end::Brand Link-->
@@ -37,7 +37,7 @@
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
-                <ul class="nav nav-treeview">
+                {{-- <ul class="nav nav-treeview">
                   <li class="nav-item">
                     <a href="{{asset('dist/index.html')}}" class="nav-link active">
                       <i class="nav-icon bi bi-circle"></i>
@@ -56,43 +56,39 @@
                       <p>Dashboard v3</p>
                     </a>
                   </li>
-                </ul>
+                </ul> --}}
               </li>
               <li class="nav-item">
-                <a href="{{asset('dist/generate/theme.html')}}" class="nav-link">
+                <a href="{{route('admin.categories.index')}}" class="nav-link">
                   <i class="nav-icon bi bi-palette"></i>
-                  <p>Theme Generate</p>
+                  <p>sssssss</p>
                 </a>
               </li>
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-box-seam-fill"></i>
                   <p>
-                    Widgets
+                    Category
                     <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
+                {{-- category & sub category --}}
                 <ul class="nav nav-treeview">
                   <li class="nav-item">
-                    <a href="{{asset('dist/widgets/small-box.html')}}" class="nav-link">
+                    <a href="{{route('admin.categories.index')}}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>Small Box</p>
+                      <p> Category</p>
                     </a>
                   </li>
                   <li class="nav-item">
-                    <a href="{{asset('dist/widgets/info-box.html')}}" class="nav-link">
+                    <a href="{{route('admin.subcategories.index')}}" class="nav-link">
                       <i class="nav-icon bi bi-circle"></i>
-                      <p>info Box</p>
-                    </a>
-                  </li>
-                  <li class="nav-item">
-                    <a href="{{asset('dist/widgets/cards.html')}}" class="nav-link">
-                      <i class="nav-icon bi bi-circle"></i>
-                      <p>Cards</p>
+                      <p>Sub Category</p>
                     </a>
                   </li>
                 </ul>
               </li>
+              
               <li class="nav-item">
                 <a href="#" class="nav-link">
                   <i class="nav-icon bi bi-clipboard-fill"></i>

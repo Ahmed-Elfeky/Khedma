@@ -1,5 +1,8 @@
-@extends('dashboard.layouts.master')
+@extends('admin.layouts.master')
+@section('title','Dashboard')
+@section('subTitle','Home')
+
 @section('content')
 
-<h1>ssssssssss</h1>
+
 @endsection
