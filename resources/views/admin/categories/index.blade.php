@@ -14,7 +14,7 @@
     @endif
 
     <table class="table table-bordered table-hover">
-        <thead>
+        <thead class="table-dark">
             <tr>
                 <th>#</th>
                 <th>Name</th>
