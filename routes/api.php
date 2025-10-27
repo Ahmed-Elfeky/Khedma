@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\FavouriteController;
 use App\Http\Controllers\Api\HomeController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
+use App\Http\Controllers\Api\RatingController;
 use App\Http\Controllers\Api\SizeController;
 use Illuminate\Support\Facades\Route;
 
@@ -32,6 +33,7 @@ Route::get('products/filter', [ProductController::class, 'filter']);
 Route::get('products', [ProductController::class, 'index']);
 Route::get('products/{id}', [ProductController::class, 'show']);
 Route::post('complaints', [ComplaintController::class, 'store']);
+Route::get('ratings/{productId}', [RatingController::class, 'index']);
 
 // =================== Authentication Routes =================== //
 Route::controller(AuthController::class)->group(function () {
@@ -42,9 +44,9 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('logout', 'logout')->middleware('auth:sanctum');
 });
 
-//  /// =================== Protected Routes (تحتاج تسجيل دخول) =================== /
+/// =================== Protected Routes (تحتاج تسجيل دخول) =================== ///
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('profile-update', [AuthController::class ,'updateProfile']);
+    Route::post('profile-update', [AuthController::class, 'updateProfile']);
 
     // ---------- Routes لجميع المستخدمين بعد تسجيل الدخول ---------- //
     Route::get('orders/filter', [OrderController::class, 'filterOrders']);
@@ -72,4 +74,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('products/update/{id}', [ProductController::class, 'update']);
         Route::delete('products/destroy/{id}', [ProductController::class, 'destroy']);
     });
+        Route::post('ratings', [RatingController::class, 'store']);
+
 });

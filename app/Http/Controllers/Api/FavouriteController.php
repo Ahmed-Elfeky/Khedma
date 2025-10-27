@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Helpers\ApiResponse;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\StoreFavouriteRequest;
+use App\Http\Requests\Api\StoreFavouriteRequest;
 use App\Http\Resources\FavouriteResource;
 use App\Http\Resources\ProductResource;
 use App\Models\Favourite;

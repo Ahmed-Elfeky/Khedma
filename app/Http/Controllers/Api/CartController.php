@@ -7,7 +7,7 @@ use App\Http\Resources\CartResource;
 use App\Models\Cart;
 use Illuminate\Support\Facades\Auth;
 use App\Helpers\ApiResponse;
-use App\Http\Requests\StoreCartRequest;
+use App\Http\Requests\Api\StoreCartRequest as ApiStoreCartRequest;
 use App\Models\Product;
 
 class CartController extends Controller
@@ -47,8 +47,7 @@ class CartController extends Controller
         ]);
     }
 
-
-    public function store(StoreCartRequest $request)
+    public function store(ApiStoreCartRequest $request)
     {
         $data = $request->validated();
         $userId = Auth::id();
