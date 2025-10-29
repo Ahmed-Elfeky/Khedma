@@ -28,9 +28,9 @@ class RegisterRequest extends FormRequest
         return [
             'name'                     => 'required|string|max:255',
             'phone'                    => 'required|string|unique:users,phone',
+            'email'                    => 'required|email',
             'password'                 => 'required|string|min:6|confirmed',
             'role'                     => 'required|in:admin,company,user',
-
             //  بيانات الشركة (لو role = company)
             'city_id'                  => 'required_if:role,company|exists:cities,id',
             'tax_number'               => 'required_if:role,company|string|max:255',

@@ -11,6 +11,10 @@ class Category extends Model
     protected $fillable = ['name', 'image', 'desc'];
 
 
+    public function offers()
+    {
+        return $this->hasMany(Offer::class);
+    }
 
     public function subCategories()
     {

@@ -9,8 +9,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\Api\LoginRequest;
+use App\Http\Requests\Api\PasswordChangeRequest;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Requests\Api\RegisterRequest;
+use App\Http\Requests\Api\ResetPassRequest;
 use App\Http\Requests\Api\UpdateProfileRequest;
 use App\Http\Requests\VerifyOtpRequest;
 use Illuminate\Http\Request;
@@ -189,8 +191,44 @@ class AuthController extends Controller
         ]);
     }
 
+    // إعادة تعيين كلمة المرور
+    public function resetPassword(ResetPassRequest $request)
+    {
+        $data = $request->validated();
+        // البحث عن المستخدم
+        $user = User::where('phone', $data['phone'])->first();
+        // لو المستخدم مش موجود
+        if (!$user) {
+            return ApiResponse::SendResponse(404, 'المستخدم غير موجود.', []);
+        }
+        // التأكد إن الكود تم التحقق منه مسبقًا
+        if (!$user->otp_verified) {
+            return ApiResponse::SendResponse(400, 'يجب التحقق من الرمز أولاً.', []);
+        }
+        // تحديث كلمة المرور وإلغاء بيانات الـ OTP
+        $user->update([
+            'password' => Hash::make($data['password']),
+            'otp_code' => null,
+            'otp_verified' => false,
+            'otp_expires_at' => null,
+        ]);
 
+        return ApiResponse::SendResponse(200, 'تمت إعادة تعيين كلمة المرور بنجاح.', []);
+    }
 
+    public function ChangePassword(PasswordChangeRequest $request)
+    {
+        $user = Auth::user();
+        // التحقق من كلمة المرور القديمة
+        if (!Hash::check($request->old_password, $user->password)) {
+            return ApiResponse::SendResponse(400, 'كلمة المرور القديمة غير صحيحة.', []);
+        }
+        // تحديث كلمة المرور الجديدة
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+        return ApiResponse::SendResponse(200, 'تم تغيير كلمة المرور بنجاح.', []);
+    }
 
     // logout //
     public function logout()

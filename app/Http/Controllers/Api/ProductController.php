@@ -38,50 +38,70 @@ class ProductController extends Controller
         );
     }
 
-    public function store(ProductRequest $request)
-    {
-        $user = Auth::user();
-        $data = $request->validated();
-        $data['user_id'] = auth()->id() ?? 1;
+public function store(ProductRequest $request)
+{
+    $user = Auth::user();
 
-        if ($request->hasFile('image')) {
-            $imageName = time() . '.' . $request->image->extension();
-            $request->image->move(public_path('uploads/products'), $imageName);
-            $data['image'] = 'uploads/products/' . $imageName;
-        }
-        $product = Product::create($data);
-
-        if ($request->hasFile('images')) {
-            $images = [];
-            foreach ($request->file('images') as $img) {
-                $imgName = uniqid() . '.' . $img->getClientOriginalExtension();
-                $img->move(public_path('uploads/products'), $imgName);
-                $images[] = ['image' => 'uploads/products/' . $imgName];
-            }
-            $product->images()->createMany($images);
-        }
-        if ($request->has('colors')) {
-            $colorIds = [];
-            foreach ($request->colors as $hex) {
-                $color = Color::firstOrCreate(['hex' => $hex]);
-                $colorIds[] = $color->id;
-            }
-            $product->colors()->sync($colorIds);
-        }
-        if ($request->has('sizes')) {
-            $sizeIds = [];
-            foreach ($request->sizes as $sizeName) {
-                $size = Size::firstOrCreate(['name' => $sizeName]);
-                $sizeIds[] = $size->id;
-            }
-            $product->sizes()->sync($sizeIds);
-        }
+    // تحقق أن المستخدم شركة ومعتمد
+    if ($user->role !== 'company' || !$user->is_approved) {
         return ApiResponse::SendResponse(
-            201,
-            'Product added successfully',
-            new ProductResource($product->load('images', 'colors', 'sizes'))
+            403,
+            'لا يمكنك إضافة منتج حتى يتم اعتماد حسابك كشركة من قبل الإدارة.',
+            []
         );
     }
+
+    $data = $request->validated();
+    $data['user_id'] = $user->id;
+
+    // رفع الصورة الرئيسية
+    if ($request->hasFile('image')) {
+        $imageName = time() . '.' . $request->image->extension();
+        $request->image->move(public_path('uploads/products'), $imageName);
+        $data['image'] = 'uploads/products/' . $imageName;
+    }
+
+    // إنشاء المنتج
+    $product = Product::create($data);
+
+    // رفع صور إضافية
+    if ($request->hasFile('images')) {
+        $images = [];
+        foreach ($request->file('images') as $img) {
+            $imgName = uniqid() . '.' . $img->getClientOriginalExtension();
+            $img->move(public_path('uploads/products'), $imgName);
+            $images[] = ['image' => 'uploads/products/' . $imgName];
+        }
+        $product->images()->createMany($images);
+    }
+
+    // الألوان
+    if ($request->has('colors')) {
+        $colorIds = [];
+        foreach ($request->colors as $hex) {
+            $color = Color::firstOrCreate(['hex' => $hex]);
+            $colorIds[] = $color->id;
+        }
+        $product->colors()->sync($colorIds);
+    }
+
+    // المقاسات
+    if ($request->has('sizes')) {
+        $sizeIds = [];
+        foreach ($request->sizes as $sizeName) {
+            $size = Size::firstOrCreate(['name' => $sizeName]);
+            $sizeIds[] = $size->id;
+        }
+        $product->sizes()->sync($sizeIds);
+    }
+
+    return ApiResponse::SendResponse(
+        201,
+        'تمت إضافة المنتج بنجاح.',
+        new ProductResource($product->load('images', 'colors', 'sizes'))
+    );
+}
+
 
     public function update(UpdateProductRequest $request, $product)
     {

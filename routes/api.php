@@ -41,13 +41,14 @@ Route::controller(AuthController::class)->group(function () {
     Route::post('login', 'login');
     Route::post('send-otp', 'sendOtp');
     Route::post('verify-otp', 'verifyOtp');
+    Route::post('password-reset', 'resetPassword');
     Route::post('logout', 'logout')->middleware('auth:sanctum');
 });
 
 /// =================== Protected Routes (تحتاج تسجيل دخول) =================== ///
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('profile-update', [AuthController::class, 'updateProfile']);
-
+    Route::post('change-password', [AuthController::class,  'ChangePassword']);
     // ---------- Routes لجميع المستخدمين بعد تسجيل الدخول ---------- //
     Route::get('orders/filter', [OrderController::class, 'filterOrders']);
     Route::get('orders/current', [OrderController::class, 'currentOrders']);
@@ -59,7 +60,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('cart/{id}', [CartController::class, 'destroy']);
     Route::get('orders', [OrderController::class, 'index']);
     Route::get('orders/{id}', [OrderController::class, 'show']);
-
 
     // ---------- User Routes (محمي بـ middleware user) ---------- //
     Route::middleware('user')->group(function () {
@@ -74,6 +74,5 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('products/update/{id}', [ProductController::class, 'update']);
         Route::delete('products/destroy/{id}', [ProductController::class, 'destroy']);
     });
-        Route::post('ratings', [RatingController::class, 'store']);
-
+    Route::post('ratings', [RatingController::class, 'store']);
 });

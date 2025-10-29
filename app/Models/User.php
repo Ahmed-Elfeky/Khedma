@@ -21,6 +21,7 @@ class User extends Authenticatable
         'otp_expires_at',
         'is_verified',
         'role',
+        'is_approved',
         'address',
         'city_id',
         'website',
@@ -31,10 +32,11 @@ class User extends Authenticatable
         'latitude'
     ];
 
-  protected $casts = [
+    protected $casts = [
         'is_verified' => 'boolean',
+        'is_approved' => 'boolean',
     ];
-
+    
     public function products()
     {
         return $this->hasMany(Product::class);
@@ -50,6 +52,10 @@ class User extends Authenticatable
         return $this->belongsTo(City::class);
     }
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -60,7 +66,4 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
-
-
-
 }

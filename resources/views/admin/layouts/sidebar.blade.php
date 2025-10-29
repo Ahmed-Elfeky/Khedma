@@ -136,21 +136,12 @@
                     </ul> --}}
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link">
+                    <a href="{{route('admin.orders.index')}}" class="nav-link">
                         <i class="nav-icon bi bi-pencil-square"></i>
                         <p>
-                            Forms
-                            <i class="nav-arrow bi bi-chevron-right"></i>
+                            Orders
                         </p>
                     </a>
-                    <ul class="nav nav-treeview">
-                        <li class="nav-item">
-                            <a href="{{asset('dist/forms/general.html')}}" class="nav-link">
-                                <i class="nav-icon bi bi-circle"></i>
-                                <p>General Elements</p>
-                            </a>
-                        </li>
-                    </ul>
                 </li>
 
                 <li class="nav-header">EXAMPLES</li>

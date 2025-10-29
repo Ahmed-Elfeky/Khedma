@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('is_verified')->default(false);
             $table->enum('role', ['user', 'company','admin'])->default('user');
             // بيانات الشركة (في حالة كان user_type = company)
+            $table->boolean('is_approved')->default(false);
             $table->string('address')->nullable();           // العنوان
             $table->foreignId('city_id')->nullable()->constrained('cities')->onDelete('set null');
             $table->string('website')->nullable();           // الموقع الإلكتروني

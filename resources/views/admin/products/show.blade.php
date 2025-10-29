@@ -2,45 +2,65 @@
 @section('title','show')
 @section('subTitle','show product')
 @section('content')
-<div class="container mt-4">
-    <div class="card mb-4">
+<div class="container mt-5">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-primary text-white text-center">
+            <h4 class="mb-0">تفاصيل المنتج</h4>
+        </div>
         <div class="card-body">
-            <h5>الاسم:</h5>
-            <p>{{ $product->name }}</p>
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h6 class="text-muted mb-1">الاسم:</h6>
+                    <p class="fw-bold">{{ $product->name }}</p>
 
-            <h5>الوصف:</h5>
-            <p>{{ $product->desc }}</p>
+                    <h6 class="text-muted mb-1">الوصف:</h6>
+                    <p>{{ $product->desc }}</p>
 
-            <h5>السعر:</h5>
-            <p>{{ $product->price }} جنيه</p>
+                    <h6 class="text-muted mb-1">السعر:</h6>
+                    <p class="fw-bold text-success">{{ $product->price }} جنيه</p>
 
-            <h5>المخزون:</h5>
-            <p>{{ $product->stock }}</p>
+                    <h6 class="text-muted mb-1">المخزون:</h6>
+                    <p>{{ $product->stock }}</p>
 
-            <h5>الخصم:</h5>
-            <p>{{ $product->discount }}%</p>
-
-            <h5>صورة المنتج الرئيسية:</h5>
-            <img src="{{ asset('uploads/products/' . $product->image) }}" alt="صورة المنتج" width="200"
-                class="rounded border mb-3">
-
-            <h5>صور إضافية:</h5>
-            @if ($product->images && $product->images->count() > 0)
-            <div class="d-flex flex-wrap gap-3">
-                @foreach ($product->images as $img)
-                <div style="width:120px;">
-                    <img src="{{ asset('uploads/products/' . $img->image) }}" alt="صورة إضافية"
-                        class="rounded border w-100">
+                    <h6 class="text-muted mb-1">الخصم:</h6>
+                    <p>{{ $product->discount }}%</p>
                 </div>
-                @endforeach
-            </div>
-            @else
-            <p class="text-muted">لا توجد صور إضافية</p>
-            @endif
 
+                <div class="col-md-6 text-center">
+                    <h6 class="text-muted mb-3">صورة المنتج الرئيسية:</h6>
+                    <img src="{{ asset('uploads/products/' . $product->image) }}"
+                         alt="صورة المنتج"
+                         class="img-fluid rounded border shadow-sm mb-3"
+                         style="max-width: 250px;">
+                </div>
+            </div>
+
+            <hr>
+
+            <h6 class="text-muted mb-3">صور إضافية:</h6>
+            @if ($product->images && $product->images->count() > 0)
+                <div class="row g-3">
+                    @foreach ($product->images as $img)
+                        <div class="col-6 col-md-3">
+                            <div class="card border-0 shadow-sm">
+                                <img src="{{ asset('uploads/products/' . $img->image) }}"
+                                     alt="صورة إضافية" width="40" height="100"
+                                     class="card-img-top rounded">
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @else
+                <p class="text-muted">لا توجد صور إضافية</p>
+            @endif
+        </div>
+
+        <div class="card-footer text-center">
+            <a href="{{ route('admin.products.index') }}" class="btn btn-secondary px-4">
+                <i class="bi bi-arrow-left"></i> رجوع
+            </a>
         </div>
     </div>
-
-    <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">رجوع</a>
 </div>
+
 @endsection

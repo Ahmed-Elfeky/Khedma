@@ -92,8 +92,6 @@ class ProductController extends Controller
                 }
                 $img->delete();
             }
-
-            //  إضافة الصور الجديدة
             foreach ($request->file('images') as $file) {
                 $imageName = Str::uuid() . '.' . $file->extension();
                 $file->move(public_path('uploads/products'), $imageName);
