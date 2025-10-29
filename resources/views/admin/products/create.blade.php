@@ -1,116 +1,95 @@
-@extends('layouts.master')
-
+@extends('admin.layouts.master')
+@section('title','product')
+@section('subTitle','create')
 @section('content')
+<div class="container">
+    <form action="{{ route('admin.products.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
 
-
-
-    <div class="breadcrumb-section breadcrumb-bg">
-        <div class="container">
-            <div class="row">
-                <div class="col-lg-8 offset-lg-2 text-center">
-                    <div class="breadcrumb-text">
-                        <p>Fresh and Organic</p>
-                        <h1>Add Product</h1>
-                    </div>
-                </div>
-            </div>
+        <div class="mb-3">
+            <label>Name</label>
+            <input name="name" value="{{ old('name') }}" class="form-control" required>
+            @error('name') <small class="text-danger">{{ $message }}</small> @enderror
         </div>
-    </div>
 
-    <!-- products -->
-    <div class="product-section mt-150 mb-150">
-        <div class="container">
-            <div class="contact-form">
-                <form method="POST" action="{{ route('front.products.store') }}" enctype="multipart/form-data">
-                    @csrf
-                    <p>
-                        <input type="text" style="width: 100%" placeholder="Name" value="{{ old('name') }}"
-                            name="name">
-                        @error('name')
-                        <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror
-                    </p>
-                    <p style="display: flex">
-                        <input type="number" class="mr-4" style="width: 50%" placeholder="price" name="price"
-                            value="{{ old('price') }}">
-                        @error('price')
-                        <p class="alert alert-danger">{{ $message }}</p>
-                    @enderror
-
-                    <input type="number" style="width:50%" placeholder="quantity" name="quantity"
-                        value="{{ old('quantity') }}" id="quantity">
-                    @error('quantity')
-                        <p class="alert alert-danger">{{ $message }}</p>
-                    @enderror
-                    </p>
-                    <p>
-                        <select id="category" class="form-control" style="width: 100%" name="category_id">
-                            <option value=""> select category</option>
-                            @foreach ($categories as $category)
-                                <option value="{{ $category->id }}"
-                                    {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                    {{ $category->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                        @error('category_id')
-                        <div style="color:red;">{{ $message }}</div>
-                    @enderror
-                    </p>
-
-                       <div class="mb-3">
-                            <label>Subcategory:</label>
-                            <select name="subcategory_id" id="subcategory" class="form-control">
-                                <option value="">-- Select Subcategory --</option>
-                            </select>
-                        </div>
-
-                    <p>
-                        <textarea name="description" id="description" cols="30" rows="10"> {{ old('description') }}</textarea>
-                        @error('description')
-                        <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror
-                    </p>
-                    <p>
-                        <label> select Images</label>
-                        <input class="form-control" type="file" placeholder="image" name="image" required>
-                        @error('image')
-                        <p class="alert alert-danger">{{ $message }}</p>
-                    @enderror
-                    </p>
-
-                    <div class="mb-3">
-                        <label> select multi Images</label>
-                        <input type="file" name="images[]" class="form-control" multiple required>
-                        @error('images')
-                            <p class="alert alert-danger">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <p>
-                        <button type="submit" class="btn btn-danger">save</button>
-                    </p>
-                </form>
-            </div>
+        <div class="mb-3">
+            <label>Subcategory</label>
+            <select name="subcategory_id" class="form-control">
+                <option value="">-- Select --</option>
+                @foreach($subcategories as $sub)
+                <option value="{{ $sub->id }}">{{ $sub->name }}</option>
+                @endforeach
+            </select>
         </div>
-    </div>
 
+        <div class="mb-3">
+            <label>Price</label>
+            <input type="number" name="price" step="0.01" value="{{ old('price') }}" class="form-control" required>
+        </div>
 
-<script>
-    let categories = @json($categories);
-    document.getElementById('category').addEventListener('change', function() {
-        let catId = this.value;
-        let subSelect = document.getElementById('subcategory');
-        subSelect.innerHTML = '<option value="">-- Select Subcategory --</option>';
+        <div class="mb-3">
+            <label>Stock</label>
+            <input type="number" name="stock" value="{{ old('stock') }}" class="form-control">
+        </div>
 
-        let selectedCat = categories.find(cat => cat.id == catId);
-        if (selectedCat && selectedCat.subcategories) {
-            selectedCat.subcategories.forEach(sub => {
-                subSelect.innerHTML += `<option value="${sub.id}">${sub.name}</option>`;
-            });
-        }
-    });
-</script>
+        <div class="mb-3">
+            <label>Discount (%)</label>
+            <input type="number" step="0.01" name="discount" value="{{ old('discount') }}" class="form-control">
+        </div>
 
+        <div class="mb-3">
+            <label>Guarantee</label>
+            <input type="text" name="guarantee" value="{{ old('guarantee') }}" class="form-control">
+        </div>
 
+        <div class="mb-3">
+            <label>Description</label>
+            <textarea name="desc" rows="3" class="form-control">{{ old('desc') }}</textarea>
+        </div>
 
+        <div class="mb-3">
+            <label>Image</label>
+            <input type="file" name="image" class="form-control">
+        </div>
+
+        <div class="mb-3">
+            <label for="images" class="form-label">Additional Images</label>
+            <input type="file" name="images[]" id="images" class="form-control" multiple>
+            <small class="text-muted">You can select multiple images</small>
+            @error('images') <small class="text-danger">{{ $message }}</small> @enderror
+            @error('images.*') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+
+        <div class="mb-3">
+            <label>Colors</label>
+            <select name="colors[]" multiple class="form-control">
+                @foreach($colors as $color)
+                <option value="{{ $color->id }}">{{ $color->name }}</option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Sizes</label>
+            <select name="sizes[]" multiple class="form-control">
+                @foreach($sizes as $size)
+                <option value="{{ $size->id }}">{{ $size->name }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="mb-3">
+            <label>Product Owner (User)</label>
+            <select name="user_id" class="form-control" required>
+                <option value="">-- Select User --</option>
+                @foreach($users as $user)
+                <option value="{{ $user->id }}">{{ $user->name }}</option>
+                @endforeach
+            </select>
+            @error('user_id') <small class="text-danger">{{ $message }}</small> @enderror
+        </div>
+
+        <button class="btn btn-success">Save</button>
+        <a href="{{ route('admin.products.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
 @endsection

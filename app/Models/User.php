@@ -16,6 +16,7 @@ class User extends Authenticatable
         'name',
         'phone',
         'password',
+        'email',
         'otp_code',
         'otp_expires_at',
         'is_verified',
@@ -60,6 +61,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-   
+
 
 }

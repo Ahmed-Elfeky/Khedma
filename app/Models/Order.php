@@ -32,5 +32,8 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-
+    public function statusHistories()
+    {
+        return $this->hasMany(OrderStatusHistory::class);
+    }
 }
