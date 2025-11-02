@@ -28,7 +28,7 @@
                             <i class="nav-arrow bi bi-chevron-right"></i>
                         </p>
                     </a>
-                    {{-- <ul class="nav nav-treeview">
+                    <ul class="nav nav-treeview">
                         <li class="nav-item">
                             <a href="{{asset('dist/index.html')}}" class="nav-link active">
                                 <i class="nav-icon bi bi-circle"></i>
@@ -47,10 +47,10 @@
                                 <p>Dashboard v3</p>
                             </a>
                         </li>
-                    </ul> --}}
+                    </ul>
                 </li>
                     <li class="nav-item">
-                    <a href="{{route('admin.products.index')}}" class="nav-link">
+                    {{-- <a href="{{route('products.index')}}" class="nav-link"> --}}
                         <i class="nav-icon bi bi-table"></i>
                         <p>
                             Products

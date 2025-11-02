@@ -20,7 +20,6 @@ class User extends Authenticatable
         'otp_code',
         'otp_expires_at',
         'is_verified',
-        'role',
         'is_approved',
         'address',
         'city_id',
@@ -29,14 +28,29 @@ class User extends Authenticatable
         'tax_number',
         'logo',
         'longitude',
-        'latitude'
+        'latitude',
+        'role_id'
     ];
 
     protected $casts = [
         'is_verified' => 'boolean',
         'is_approved' => 'boolean',
     ];
-    
+    // public function hasRole($role)
+    // {
+    //     return $this->role === $role;
+    // }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+
+    public function hasPermission($permission)
+    {
+        return $this->role
+            && $this->role->permissions->pluck('name')->contains($permission);
+    }
     public function products()
     {
         return $this->hasMany(Product::class);

@@ -16,11 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('phone')->unique();
             $table->string('password');
-            $table->string('email')->nullable();
+            $table->string('email')->nullable()->unique();
             $table->string('otp_code')->nullable();
             $table->timestamp('otp_expires_at')->nullable();
             $table->boolean('is_verified')->default(false);
-            $table->enum('role', ['user', 'company','admin'])->default('user');
+            $table->foreignId('role_id')->nullable()->constrained('roles')->onDelete('set null');
             // بيانات الشركة (في حالة كان user_type = company)
             $table->boolean('is_approved')->default(false);
             $table->string('address')->nullable();           // العنوان

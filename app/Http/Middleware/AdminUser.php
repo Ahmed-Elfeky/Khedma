@@ -10,20 +10,21 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AdminUser
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
 
-        if (!$user) {
-            return ApiResponse::SendResponse(401, 'User Unauthorized', []);
+        if ($request->is('api/*') && !$user) {
+            return ApiResponse::SendResponse(401, 'Unauthorized API call', []);
         }
-        if ($user->role !== 'admin') {
+
+        if ($request->is('api/*') && $user->role !== 'admin') {
             return ApiResponse::SendResponse(403, 'Access denied. Only admins allowed.', []);
+        }
+
+        if (!$request->is('api/*') && !$user) {
+            return redirect()->route('admin.login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
         return $next($request);
     }

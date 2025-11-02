@@ -15,6 +15,17 @@ class Category extends Model
     {
         return $this->hasMany(Offer::class);
     }
+    public function hasActiveOffer()
+    {
+        $now = now();
+
+        return $this->offer()
+            ->where('is_active', true)
+            ->where('start_date', '<=', $now)
+            ->where('end_date', '>=', $now)
+            ->exists();
+    }
+
 
     public function subCategories()
     {

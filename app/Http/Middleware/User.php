@@ -13,15 +13,18 @@ class User
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-
         if (!$user) {
-            return ApiResponse::SendResponse(401, 'User Unauthorized', []);
+            if ($request->is('api/*')) {
+                return ApiResponse::SendResponse(401, 'User Unauthorized', []);
+            }
+            return redirect()->route('login')->with('error', 'يجب تسجيل الدخول أولاً');
         }
-
         if ($user->role !== 'user') {
-            return ApiResponse::SendResponse(403, 'Only normal users can access this route.', []);
+            if ($request->is('api/*')) {
+                return ApiResponse::SendResponse(403, 'Only normal users can access this route.', []);
+            }
+            abort(403, 'غير مصرح لك بالدخول إلى هذه الصفحة');
         }
-
         return $next($request);
     }
 }

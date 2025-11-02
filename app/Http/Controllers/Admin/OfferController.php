@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreOfferRequest;
 use App\Models\Offer;
 use App\Models\Category;
+use Carbon\Carbon;
 
 class OfferController extends Controller
 {
@@ -21,15 +22,33 @@ class OfferController extends Controller
         return view('admin.offers.create', compact('categories'));
     }
 
-    public function store(StoreOfferRequest $request)
-    {
 
-        $data = $request->validated();
-        
-        Offer::create($data);
+public function store(StoreOfferRequest $request)
+{
+    $data = $request->validated();
 
-        return redirect()->route('admin.offers.index')->with('success', 'تم إنشاء العرض بنجاح ✅');
+    // التواريخ الحالية
+    $now = Carbon::now();
+
+    // تحقق إذا القسم عليه عرض ساري الآن
+    $activeOfferExists = Offer::where('category_id', $data['category_id'])
+        ->where('is_active', true)
+        ->where('start_date', '<=', $now)
+        ->where('end_date', '>=', $now)
+        ->exists();
+
+    if ($activeOfferExists) {
+        return redirect()->back()->withErrors([
+            'category_id' => '⚠️ هذا القسم عليه عرض ساري حاليًا، لا يمكن إضافة عرض جديد إلا بعد انتهاء العرض الحالي.',
+        ])->withInput();
     }
+
+    // إنشاء العرض الجديد
+    Offer::create($data);
+
+    return redirect()->route('admin.offers.index')->with('success', 'تم إنشاء العرض بنجاح');
+}
+
     public function edit(Offer $offer)
     {
         $categories = Category::all();

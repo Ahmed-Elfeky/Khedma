@@ -6,7 +6,7 @@
     <div class="card shadow border-0">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h4 class="mb-0">قائمة العروض</h4>
-            <a href="{{ route('admin.offers.create') }}" class="btn btn-light btn-sm">+ عرض جديد</a>
+            <a href="{{ route('admin.offers.create') }}" class="btn btn-dark btn-sm">+ عرض جديد</a>
         </div>
 
         <div class="card-body">
